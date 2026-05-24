@@ -3,6 +3,5 @@ __pycache__
 *.pyc
 .git
 data/
-src/classifier.pkl
 src/X_test_embeddings.npy
 src/y_test.npy

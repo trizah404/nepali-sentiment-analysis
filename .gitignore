@@ -1,7 +1,6 @@
 __pycache__/
 *.pyc
 .env
-src/classifier.pkl
 src/X_test_embeddings.npy
 src/y_test.npy
 src/confusion_matrix.png
