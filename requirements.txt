@@ -1,1 +1,6 @@
-python -m pip freeze > requirements.txt
+python -m pip freeze > requirements.txtfastapi
+uvicorn
+sentence-transformers
+scikit-learn
+numpy
+python-multipart
