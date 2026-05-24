@@ -1,4 +1,4 @@
-python -m pip freeze > requirements.txtfastapi
+fastapi
 uvicorn
 sentence-transformers
 scikit-learn
