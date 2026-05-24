@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>भाव — Nepali Sentiment</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Syne+Mono&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Syne',sans-serif;background:#F4F1EB;color:#111;min-height:100vh}
+.page{max-width:680px;margin:0 auto;padding:56px 28px 80px}
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:56px}
+.logo{font-size:1.1rem;font-weight:800;letter-spacing:-0.01em}
+.logo-np{color:#C85A3A}
+.tag{font-family:'Syne Mono',monospace;font-size:0.65rem;color:#999;letter-spacing:0.1em;text-transform:uppercase;padding:5px 12px;border:1.5px solid #ddd;border-radius:100px}
+.hero{margin-bottom:40px}
+.hero-title{font-size:4rem;font-weight:800;line-height:1.05;letter-spacing:-0.03em;margin-bottom:20px}
+.hero-title .accent{color:#C85A3A}
+.hero-desc{font-size:0.88rem;color:#666;line-height:1.7;max-width:480px;border-left:3px solid #C85A3A;padding-left:14px}
+.divider{height:1px;background:#E2DDD4;margin:36px 0}
+textarea{width:100%;height:130px;background:#fff;border:2px solid #E2DDD4;border-radius:12px;padding:18px;font-family:'Syne',sans-serif;font-size:0.95rem;color:#111;resize:none;outline:none;transition:border-color 0.2s;line-height:1.6;display:block;margin-bottom:10px}
+textarea::placeholder{color:#bbb}
+textarea:focus{border-color:#111}
+.btn-main{width:100%;padding:16px;background:#111;color:#F4F1EB;border:none;border-radius:10px;font-family:'Syne',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;letter-spacing:0.04em;text-transform:uppercase;transition:opacity 0.15s,transform 0.1s;margin-bottom:24px}
+.btn-main:hover{opacity:0.85}
+.btn-main:active{transform:scale(0.99)}
+.btn-main:disabled{opacity:0.3;cursor:not-allowed}
+.examples{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:36px}
+.ex-label{width:100%;font-family:'Syne Mono',monospace;font-size:0.62rem;color:#aaa;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:6px}
+.ex-btn{padding:8px 16px;background:transparent;border:1.5px solid #D5D0C7;border-radius:8px;font-family:'Syne',sans-serif;font-size:0.78rem;font-weight:700;color:#666;cursor:pointer;transition:all 0.12s}
+.ex-btn:hover{border-color:#111;color:#111;background:#fff}
+.error{padding:14px 18px;background:#FAEAE7;border:1.5px solid #F0C4BA;border-radius:10px;font-size:0.83rem;color:#A03020;display:none;margin-bottom:16px;font-weight:700}
+.result-area{display:none;animation:up 0.3s ease}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.result-card{border-radius:14px;padding:28px 28px 24px;margin-bottom:12px;border:2px solid}
+.result-card.positive{background:#E6F4EE;border-color:#A8D8BC}
+.result-card.negative{background:#FAEAE7;border-color:#F0C4BA}
+.result-card.neutral{background:#FBF4E3;border-color:#E8D4A0}
+.result-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.result-word{font-size:3.2rem;font-weight:800;letter-spacing:-0.03em;line-height:1}
+.result-word.positive{color:#1A5C35}
+.result-word.negative{color:#A03020}
+.result-word.neutral{color:#8A6020}
+.result-badge{font-family:'Syne Mono',monospace;font-size:0.65rem;font-weight:400;letter-spacing:0.08em;text-transform:uppercase;padding:5px 10px;border-radius:6px}
+.result-badge.positive{background:#2D7A4F;color:#fff}
+.result-badge.negative{background:#C85A3A;color:#fff}
+.result-badge.neutral{background:#B07D2A;color:#fff}
+.conf-bar{height:3px;background:rgba(0,0,0,0.1);border-radius:2px;overflow:hidden;margin-bottom:16px}
+.conf-fill{height:100%;border-radius:2px;transition:width 0.7s cubic-bezier(0.16,1,0.3,1);width:0}
+.conf-fill.positive{background:#2D7A4F}
+.conf-fill.negative{background:#C85A3A}
+.conf-fill.neutral{background:#B07D2A}
+.conf-text{font-family:'Syne Mono',monospace;font-size:0.7rem;color:#999;margin-bottom:16px}
+.result-quote{font-size:0.85rem;color:#666;line-height:1.6;padding-top:14px;border-top:1px solid rgba(0,0,0,0.07)}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:#fff;border:1.5px solid #E2DDD4;border-radius:10px;padding:14px;text-align:center}
+.stat-label{font-family:'Syne Mono',monospace;font-size:0.6rem;color:#aaa;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:5px}
+.stat-val{font-size:1.4rem;font-weight:800;color:#111;letter-spacing:-0.02em}
+.footer{margin-top:56px;padding-top:20px;border-top:1px solid #E2DDD4;display:flex;justify-content:space-between}
+.footer-text{font-family:'Syne Mono',monospace;font-size:0.6rem;color:#bbb;letter-spacing:0.06em;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top-bar">
+    <div class="logo"><span class="logo-np">भाव</span>DETECT</div>
+    <div class="tag">NLP · Nepali · v1.0</div>
+  </div>
+
+  <div class="hero">
+    <div class="hero-title">Nepali<br>Sentiment<br><span class="accent">Analysis.</span></div>
+    <p class="hero-desc">
+      Most NLP tools are built for English. This one is built for Nepali — trained on 35,789 real Nepali sentences using multilingual embeddings and a 3-class sentiment classifier. Type any Nepali text and get an instant prediction: positive, negative, or neutral.
+    </p>
+  </div>
+
+  <div class="divider"></div>
+
+  <textarea id="txt" placeholder="नेपाली वाक्य लेख्नुहोस्..."></textarea>
+  <button class="btn-main" id="btn">Analyze Sentiment →</button>
+
+  <div class="examples">
+    <div class="ex-label">Try an example</div>
+    <button class="ex-btn" onclick="set('यो फिल्म धेरै राम्रो थियो')">राम्रो फिल्म</button>
+    <button class="ex-btn" onclick="set('यो फिल्म एकदम नराम्रो थियो')">नराम्रो फिल्म</button>
+    <button class="ex-btn" onclick="set('आज मौसम सामान्य छ')">सामान्य मौसम</button>
+    <button class="ex-btn" onclick="set('नेपालले विश्वकप खेल्ने अवसर पायो')">विश्वकप</button>
+    <button class="ex-btn" onclick="set('भूकम्पले सयौं घर भत्कियो')">भूकम्प</button>
+  </div>
+
+  <div class="error" id="err"></div>
+
+  <div class="result-area" id="res">
+    <div class="result-card" id="card">
+      <div class="result-top">
+        <div class="result-word" id="word"></div>
+        <div class="result-badge" id="badge"></div>
+      </div>
+      <div class="conf-text" id="conf"></div>
+      <div class="conf-bar"><div class="conf-fill" id="fill"></div></div>
+      <div class="result-quote" id="quote"></div>
+    </div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-label">Sentiment</div><div class="stat-val" id="s1">—</div></div>
+      <div class="stat"><div class="stat-label">Confidence</div><div class="stat-val" id="s2">—</div></div>
+      <div class="stat"><div class="stat-label">Words</div><div class="stat-val" id="s3">—</div></div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span class="footer-text">35,789 Nepali samples</span>
+    <span class="footer-text">Multilingual embeddings + logistic regression</span>
+  </div>
+
+</div>
+<script>
+const API="http://127.0.0.1:8000";
+const txt=document.getElementById("txt"),btn=document.getElementById("btn"),res=document.getElementById("res"),card=document.getElementById("card"),word=document.getElementById("word"),badge=document.getElementById("badge"),conf=document.getElementById("conf"),fill=document.getElementById("fill"),quote=document.getElementById("quote"),err=document.getElementById("err"),s1=document.getElementById("s1"),s2=document.getElementById("s2"),s3=document.getElementById("s3");
+function set(t){txt.value=t;txt.focus()}
+btn.addEventListener("click",async()=>{
+  const text=txt.value.trim();if(!text)return;
+  btn.disabled=true;btn.textContent="Analyzing...";err.style.display="none";res.style.display="none";
+  try{
+    const r=await fetch(`${API}/predict`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({text})});
+    const d=await r.json();
+    if(d.error){err.textContent=d.error;err.style.display="block";}
+    else{
+      const cls=d.sentiment.toLowerCase();
+      card.className=`result-card ${cls}`;
+      word.className=`result-word ${cls}`;word.textContent=d.sentiment;
+      badge.className=`result-badge ${cls}`;badge.textContent=d.sentiment;
+      conf.textContent=`${d.confidence}% confidence`;
+      fill.className=`conf-fill ${cls}`;fill.style.width="0%";
+      setTimeout(()=>fill.style.width=`${d.confidence}%`,50);
+      quote.textContent=`"${text}"`;
+      s1.textContent=d.sentiment;s2.textContent=`${d.confidence}%`;
+      s3.textContent=text.split(/\s+/).filter(Boolean).length;
+      res.style.display="block";
+    }
+  }catch(e){err.textContent="Cannot connect to API. Make sure the server is running.";err.style.display="block";}
+  btn.disabled=false;btn.textContent="Analyze Sentiment →";
+});
+txt.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.ctrlKey)btn.click()});
+</script>
+</body>
+</html>
